@@ -1,0 +1,51 @@
+name: packet node Rapsberry Pi image builder
+on:
+  push:
+    branches: [ master ]
+jobs:
+
+  build:
+    name: Build Raspberry Pi image for packet node
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.19
+        uses: actions/setup-go@v3.5.0
+        with:
+          go-version: 1.19
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v3.3.0
+
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+          if [ -f Gopkg.toml ]; then
+              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+              dep ensure
+          fi
+
+      - name: Fetch additional packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install fdisk gdisk qemu-user-static libarchive-tools tar
+
+      - name: Build
+        run: go build -v .
+
+      - name: Install Packer
+        uses: hashicorp-contrib/setup-packer@v2
+        with:
+          packer-version: 1.8.6
+
+      - name: Install packer-builder-arm
+        uses: mkaczanowski/packer-builder-arm # this isn't an action ****
+        with:
+          packer-version: 1.8.6
+        xx
+
+      - name: Validate
+        run: PACKER_LOG=1 packer validate raspbian.pkr.hcl
+
+      - name: Build image
+        run: sudo PACKER_LOG=1 packer build raspbian.pkr.hcl

@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# Derived from http://www.cantab.net/users/john.wiseman/Downloads/installLinBPQ
+
+if [[ $HOSTTYPE == *86* ]]; 
+then
+ export LINBPQ=linbpq;
+ export APRS=x86BPQAPRS
+ else
+ export LINBPQ=pilinbpq;
+ export APRS=piBPQAPRS
+fi 
+
+echo "Downloading $LINBPQ and $APRS to linbpq and bpqaprs"
+mkdir linbpq
+cd linbpq
+wget -nv http://www.cantab.net/users/john.wiseman/Downloads/Beta/$LINBPQ -O linbpq
+chmod +x linbpq
+mkdir HTML
+cd HTML
+wget -nv http://www.cantab.net/users/john.wiseman/Downloads/Beta/HTMLPages.zip
+unzip -o -q HTMLPages.zip
+rm HTMLPages.zip
+cd ..
+wget -nv http://www.cantab.net/users/john.wiseman/Downloads/LinBPQAPRS.zip
+unzip -o -q LinBPQAPRS.zip
+rm LinBPQAPRS.zip
+wget -nv http://www.cantab.net/users/john.wiseman/Downloads/Beta/$APRS -O bpqaprs
+chmod +x bpqaprs
+
